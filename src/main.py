@@ -70,10 +70,10 @@ def update_spl(mode):
 
 def next_step():
     global expand,sp,step,total_time,found
-    s=time.time()
-    step+=1
     if found:
         return
+    s=time.time()
+    step+=1
     #find next node to be expanded
     min=999
     for i in range(n):
@@ -83,6 +83,7 @@ def next_step():
 
     if expand==end:
         found=True
+        update_stat()
         update_graph()
         show_answer()
         return
@@ -90,6 +91,7 @@ def next_step():
     if min==999 :
         expand=""
         found=True
+        update_stat()
         update_graph()
         show_answer()
         return
@@ -148,7 +150,7 @@ def update_graph():
 
 def update_stat():
     display_step.config(text=f"steps: {step}")
-    display_time.config(text=f"time: {total_time}")
+    display_time.config(text="time: {:.4f} seconds".format(total_time))
 
 
 Button(frm, text="search !", command=on_click).grid(column=4, row=0)
@@ -156,7 +158,7 @@ Button(frm, text="next step", command=next_step).grid(column=4, row=1)
 
 display_step=Label(frm,text=f"steps: {step}")
 display_step.grid(column=6,row=3)
-display_time=Label(frm,text=f"time: {total_time}")
+display_time=Label(frm,text="time: {:.4f} seconds".format(total_time))
 display_time.grid(column=7,row=3)
 
 Label(frm,text="shortest path: ").grid(row=1,column=0)
