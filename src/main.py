@@ -5,7 +5,11 @@ import matplotlib.pyplot as plt
 from numpy import True_
 import my_networkx as mynx
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import time
+
 INF = 999
+total_time = 0
+step=0
 
 #Read adjacency matrix from config.txt
 with open("test/test1.txt") as f :
@@ -27,10 +31,11 @@ end_node.grid(column=3, row=0)
 
 #Method for getting the input
 def on_click():
-    global start,end,spl,sp
+    global start,end,spl,sp,total_time
     start = start_node.get()
     end = end_node.get()
     if(start in list(G)) and (end in list(G)):
+        s = time.time()
         shortest_path.config(text=" ")
         shortest_path_length.config(text=" ")
         desc.config(text=f"Shortest path from {start} to")
@@ -38,12 +43,16 @@ def on_click():
         spl[i]=0
         sp[i]=start
         update_spl(1)
+        e = time.time()
+        total_time+=(e-s)
     else:
         shortest_path.config(text="NOT VALID")
         shortest_path_length.config(text="NOT VALID")
+    update_stat()
 
 def update_spl(mode):
-    global display_spl,display_sp
+    global display_spl,display_sp,total_time
+    s=time.time()
     if(mode==1):  
         for i in range(n):
             display_spl.append(Label(frm,text=spl[i]))
@@ -55,8 +64,16 @@ def update_spl(mode):
             display_spl[i].config(text=spl[i])
             display_sp[i].config(text=sp[i])
 
+    e=time.time()
+    total_time+=(e-s)
+    update_stat()
+
 def next_step():
-    global expand,sp
+    global expand,sp,step,total_time,found
+    s=time.time()
+    step+=1
+    if found:
+        return
     #find next node to be expanded
     min=999
     for i in range(n):
@@ -64,8 +81,15 @@ def next_step():
             expand=list(G)[i]
             min = spl[i]
 
+    if expand==end:
+        found=True
+        update_graph()
+        show_answer()
+        return
+
     if min==999 :
         expand=""
+        found=True
         update_graph()
         show_answer()
         return
@@ -82,6 +106,9 @@ def next_step():
     visited[src] = True
 
     update_spl(2)
+    e=time.time()
+    total_time+=(e-s)
+    update_stat()
     
 def show_answer():
     i = list(G).index(end)
@@ -119,8 +146,18 @@ def update_graph():
     canvas = FigureCanvasTkAgg(f,root)
     canvas.get_tk_widget().grid(column=0,row=2,columnspan=3)
 
+def update_stat():
+    display_step.config(text=f"steps: {step}")
+    display_time.config(text=f"time: {total_time}")
+
+
 Button(frm, text="search !", command=on_click).grid(column=4, row=0)
 Button(frm, text="next step", command=next_step).grid(column=4, row=1)
+
+display_step=Label(frm,text=f"steps: {step}")
+display_step.grid(column=6,row=3)
+display_time=Label(frm,text=f"time: {total_time}")
+display_time.grid(column=7,row=3)
 
 Label(frm,text="shortest path: ").grid(row=1,column=0)
 shortest_path = Label(frm,text="   ")
@@ -153,6 +190,7 @@ sp = ["" for j in range(n)]
 expand = ""
 display_spl=[]
 display_sp=[]
+found=False
 update_graph()
 
 
