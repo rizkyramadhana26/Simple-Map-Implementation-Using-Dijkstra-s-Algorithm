@@ -3,6 +3,14 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import my_networkx as mynx
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+INF = 999
+
+#Read adjacency matrix from config.txt
+with open("src/config.txt") as f :
+    lines = f.readlines()
+    lines = [x.strip().split(" ") for x in lines]
+    adjacency = [[int(y) if y.isnumeric() else INF for y in x] for x in lines]
+    print(adjacency)
 
 root = Tk()
 frm = Frame(root, padx=10)
@@ -15,7 +23,7 @@ Label(frm, text="shortest path length: ").grid(column=4, row=0)
 Label(frm, text="   ").grid(column=5, row=0)
 Button(frm, text="search !", command=root.destroy).grid(column=6, row=0)
 
-INF = 999
+
 adjacency = [[1,INF,2],[3,2,1],[2,5,INF]]
 n = len(adjacency)
 
